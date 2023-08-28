@@ -6,20 +6,20 @@ using System.Linq.Expressions;
 using System.Threading;
 using UnityEngine;
 using UnityEngine.AI;
-using UnityEngine.InputSystem;
 
 // Help me 
+// TO DO: Fix shooting cool down
 public class Player : MonoBehaviour
 {
     // Jump
-    [SerializeField] private float jumpHeight = 3f;
-    [SerializeField] private float downwardMovementMultiplier = 3f;
-    [SerializeField] private float upwardMovementMultiplier = 1.7f;
+    [SerializeField] private float _jumpHeight = 3f;
+    [SerializeField] private float _downwardMovementMultiplier = 3f;
+    [SerializeField] private float _upwardMovementMultiplier = 1.7f;
 
     // Movement
-    [SerializeField] private float maxSpeed = 4f;
-    [SerializeField] private float maxAcceleration = 35f;
-    [SerializeField] private float maxAirAcceleration = 20f;
+    [SerializeField] private float _maxSpeed = 4f;
+    [SerializeField] private float _maxAcceleration = 35f;
+    [SerializeField] private float _maxAirAcceleration = 20f;
 
     private Rigidbody2D rb;
     public float RaycastDistance = 1;
@@ -28,15 +28,20 @@ public class Player : MonoBehaviour
 
     // jump
     private float DefaultGravityScale, JumpSpeed;
-    private bool IsGrounded;
+    private bool DesiredJump, OnGround;
 
     // Movement
     private Vector2 _desiredVelocity;
+<<<<<<< HEAD
     private float maxSpeedChange, acceleration;
     public Vector2 MousePosInCameraSpace;
     GameObject ControllerCursor;
 
 
+=======
+    private float _maxSpeedChange, _acceleration;
+
+>>>>>>> parent of f13981f (Added support for new input system)
     public GunType gun1;
     public GunType gun2;
     private GameObject Gun1Instance;
@@ -56,6 +61,7 @@ public class Player : MonoBehaviour
         rb = gameObject.GetComponent<Rigidbody2D>();
         DefaultGravityScale = 1;
         sprite = gameObject.GetComponent<SpriteRenderer>();
+<<<<<<< HEAD
         if(gun1 != null)
         {
             Gun1Instance = Instantiate(gun1, transform).gameObject;
@@ -69,6 +75,13 @@ public class Player : MonoBehaviour
         GameCamera = FindObjectOfType<Camera>();
         IsMovingControllerRightJoystick = false;
         ControllerCursor = GameObject.Find("Cursor");
+=======
+
+        Gun1Instance = Instantiate(gun1, transform).gameObject;
+        Gun2Instance = Instantiate(gun2, transform).gameObject;
+        Gun1Instance.SetActive(true);
+        Gun2Instance.SetActive(false);
+>>>>>>> parent of f13981f (Added support for new input system)
     }
 
     // Update is called once per frame
@@ -83,15 +96,20 @@ public class Player : MonoBehaviour
 
         }
         Grounded();
-        /*if(gun1 is LaserGun && Gun1Instance.activeInHierarchy)
+        if(gun1 is LaserGun && Gun1Instance.activeInHierarchy)
             {
                 if(Gun1Instance.GetComponent<LaserGun>().ActualTimeStillBeforeShooting == 0)
                 {
                     if(Input.GetKeyDown(KeyCode.Space))
                     {
+                        DesiredJump = true;
                         Jump();
                     }
-                    _desiredVelocity = new Vector2(Input.GetAxisRaw("Horizontal") * (maxSpeed - GroundFriction), 0f);
+                    else
+                    {
+                        DesiredJump = false;
+                    }
+                    _desiredVelocity = new Vector2(Input.GetAxisRaw("Horizontal") * (_maxSpeed - GroundFriction), 0f);
                 }
             }
             else if(gun2 is LaserGun && Gun2Instance.activeInHierarchy)
@@ -100,19 +118,29 @@ public class Player : MonoBehaviour
                 {
                     if(Input.GetKeyDown(KeyCode.Space))
                     {
+                        DesiredJump = true;
                         Jump();
                     }
-                    _desiredVelocity = new Vector2(Input.GetAxisRaw("Horizontal") * (maxSpeed - GroundFriction), 0f);
+                    else
+                    {
+                        DesiredJump = false;
+                    }
+                    _desiredVelocity = new Vector2(Input.GetAxisRaw("Horizontal") * (_maxSpeed - GroundFriction), 0f);
                 }
             }
             else{
 
                 if(Input.GetKeyDown(KeyCode.Space))
                 {
+                    DesiredJump = true;
                     Jump();
                 }
-                _desiredVelocity = new Vector2(Input.GetAxisRaw("Horizontal") * (maxSpeed - GroundFriction), 0f);
-            }*/
+                else
+                {
+                    DesiredJump = false;
+                }
+                _desiredVelocity = new Vector2(Input.GetAxisRaw("Horizontal") * (_maxSpeed - GroundFriction), 0f);
+            }
         if(_desiredVelocity.x > 0)
         {
             sprite.flipX = true;
@@ -125,7 +153,7 @@ public class Player : MonoBehaviour
     }
     void ChangeGun()
     {
-        /*if(Input.GetKeyDown(KeyCode.Q))
+        if(Input.GetKeyDown(KeyCode.Q))
         {
             if(Gun1Instance.activeSelf == true)
             {
@@ -179,11 +207,10 @@ public class Player : MonoBehaviour
                 Gun2Instance.SetActive(false);
                 Gun1Instance.SetActive(true);
             }
-        }*/
+        }
     }
     private void FixedUpdate() {
-        Move();
-            /*if(gun1 is LaserGun && Gun1Instance.activeInHierarchy)
+            if(gun1 is LaserGun && Gun1Instance.activeInHierarchy)
             {
                 if(Gun1Instance.GetComponent<LaserGun>().ActualTimeStillBeforeShooting == 0)
                 {
@@ -199,6 +226,7 @@ public class Player : MonoBehaviour
             }
             else{
                 Move();
+<<<<<<< HEAD
             }*/
     if(IsMovingControllerRightJoystick)
     {
@@ -239,6 +267,9 @@ ControllerCursor.transform.position += (Vector3)ControllerMagnitude * Time.delta
             }
         }
     }
+=======
+            }
+>>>>>>> parent of f13981f (Added support for new input system)
     }
     public void SetVelocity(Vector2 velocity)
     {
@@ -246,15 +277,16 @@ ControllerCursor.transform.position += (Vector3)ControllerMagnitude * Time.delta
     }
     void Move()
     {
-        if(IsGrounded)
+            if(OnGround)
             {
-                acceleration = maxAcceleration;
+                _acceleration = _maxAcceleration;
             }
             else
             {
-                acceleration = maxAirAcceleration;
+                _acceleration = _maxAirAcceleration;
             }
 
+<<<<<<< HEAD
             maxSpeedChange = acceleration * Time.deltaTime;
             rb.velocity = new Vector2(Mathf.MoveTowards(rb.velocity.x, MovementInputX * (maxSpeed - GroundFriction), maxSpeedChange), rb.velocity.y);
     }
@@ -293,26 +325,33 @@ ControllerCursor.transform.position += (Vector3)ControllerMagnitude * Time.delta
     }
         }
     public void Jump(InputAction.CallbackContext context)
+=======
+            _maxSpeedChange = _acceleration * Time.deltaTime;
+
+            rb.velocity = new Vector2(Mathf.MoveTowards(rb.velocity.x, _desiredVelocity.x, _maxSpeedChange), rb.velocity.y);
+    }
+    void Jump()
+>>>>>>> parent of f13981f (Added support for new input system)
     {
-        if(context.performed)
+        if(DesiredJump)
         {
+            DesiredJump = false;
             JumpAction();
-            
-            // if I am jumping
-            if(rb.velocity.y > 0)
-            {
-                rb.gravityScale = upwardMovementMultiplier;
-            }
-            // if I am falling
-            else if(rb.velocity.y < 0)
-            {
-                rb.gravityScale = downwardMovementMultiplier;
-            }
-            // if not falling or jumping
-            else if(rb.velocity.y == 0)
-            {
-                rb.gravityScale = DefaultGravityScale;
-            }
+        }
+        // if I am jumping
+        if(rb.velocity.y > 0)
+        {
+            rb.gravityScale = _upwardMovementMultiplier;
+        }
+        // if I am falling
+        else if(rb.velocity.y < 0)
+        {
+            rb.gravityScale = _downwardMovementMultiplier;
+        }
+        // if not falling or jumping
+        else if(rb.velocity.y == 0)
+        {
+            rb.gravityScale = DefaultGravityScale;
         }
     }
     void Grounded()
@@ -320,18 +359,18 @@ ControllerCursor.transform.position += (Vector3)ControllerMagnitude * Time.delta
         RaycastHit2D hit = Physics2D.Raycast(transform.position, Vector2.down, RaycastDistance, GroundedLayers);
         if(hit.collider != null)
         {
-            IsGrounded = true;
+            OnGround = true;
         }
         else
         {
-            IsGrounded = false;
+            OnGround = false;
         }
     }
     void JumpAction()
     {
-        if (IsGrounded)
+        if (OnGround)
             {
-                JumpSpeed = Mathf.Sqrt(-2f * Physics2D.gravity.y * jumpHeight);
+                JumpSpeed = Mathf.Sqrt(-2f * Physics2D.gravity.y * _jumpHeight);
                 
                 if (rb.velocity.y > 0f)
                 {
