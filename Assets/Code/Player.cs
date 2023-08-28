@@ -33,35 +33,55 @@ public class Player : MonoBehaviour
     // Movement
     private Vector2 _desiredVelocity;
     private float maxSpeedChange, acceleration;
-    private PlayerInput playerInput;
-    PlayerInputAction playerInputActions;
-    GameObject PlayerPrefab;
-    InputDevice input;
+    public Vector2 MousePosInCameraSpace;
+    GameObject ControllerCursor;
 
-    /*public GunType gun1;
+
+    public GunType gun1;
     public GunType gun2;
     private GameObject Gun1Instance;
-    private GameObject Gun2Instance;*/
+    private GameObject Gun2Instance;
     public LayerMask GroundedLayers;
+    float MovementInputX;
+    public bool IsHoldingShoot;
+    public float ControllerMoveSpeed;
+    Camera GameCamera;
+    public bool IsMovingControllerRightJoystick;
+    Vector2 ControllerMagnitude;
+    Vector2 CursorPos;
+    public float StickDeadzone;
 
     void Awake()
     {
         rb = gameObject.GetComponent<Rigidbody2D>();
         DefaultGravityScale = 1;
         sprite = gameObject.GetComponent<SpriteRenderer>();
-        playerInput = GetComponent<PlayerInput>();
-
-        playerInputActions.Player.Enable();
-        playerInputActions.Player.Jump.performed += Jump;
-        /*Gun1Instance = Instantiate(gun1, transform).gameObject;
-        Gun2Instance = Instantiate(gun2, transform).gameObject;
-        Gun1Instance.SetActive(true);
-        Gun2Instance.SetActive(false);*/
+        if(gun1 != null)
+        {
+            Gun1Instance = Instantiate(gun1, transform).gameObject;
+            Gun1Instance.SetActive(true);
+        }
+        if(gun2 != null)
+        {
+            Gun2Instance = Instantiate(gun2, transform).gameObject;
+            Gun2Instance.SetActive(false);
+        }
+        GameCamera = FindObjectOfType<Camera>();
+        IsMovingControllerRightJoystick = false;
+        ControllerCursor = GameObject.Find("Cursor");
     }
 
     // Update is called once per frame
     void Update()
     {
+        if(!IsMovingControllerRightJoystick)
+        {
+
+        }
+        else
+        {
+
+        }
         Grounded();
         /*if(gun1 is LaserGun && Gun1Instance.activeInHierarchy)
             {
@@ -180,12 +200,51 @@ public class Player : MonoBehaviour
             else{
                 Move();
             }*/
+    if(IsMovingControllerRightJoystick)
+    {
+        if(ControllerMagnitude.x > 0)
+        {
+            if(ControllerMagnitude.x > StickDeadzone)
+            {
+ControllerCursor.transform.position += (Vector3)ControllerMagnitude * Time.deltaTime * ControllerMoveSpeed;
+        MousePosInCameraSpace = ControllerCursor.transform.position;
+        print(ControllerMagnitude);
+            }
+        }
+        else if(ControllerMagnitude.x < 0)
+        {
+            if(ControllerMagnitude.x < -StickDeadzone)
+            {
+ControllerCursor.transform.position += (Vector3)ControllerMagnitude * Time.deltaTime * ControllerMoveSpeed;
+        MousePosInCameraSpace = ControllerCursor.transform.position;
+        print(ControllerMagnitude);
+            }
+        }
+        if(ControllerMagnitude.y > 0)
+        {
+            if(ControllerMagnitude.y > StickDeadzone)
+            {
+                ControllerCursor.transform.position += (Vector3)ControllerMagnitude * Time.deltaTime * ControllerMoveSpeed;
+        MousePosInCameraSpace = ControllerCursor.transform.position;
+        print(ControllerMagnitude);
+            }
+        }
+        else if(ControllerMagnitude.y < 0)
+        {
+            if(ControllerMagnitude.y < -StickDeadzone)
+            {
+                ControllerCursor.transform.position += (Vector3)ControllerMagnitude * Time.deltaTime * ControllerMoveSpeed;
+        MousePosInCameraSpace = ControllerCursor.transform.position;
+        print(ControllerMagnitude);
+            }
+        }
+    }
     }
     public void SetVelocity(Vector2 velocity)
     {
         rb.velocity += velocity;
     }
-    public void Move()
+    void Move()
     {
         if(IsGrounded)
             {
@@ -197,8 +256,42 @@ public class Player : MonoBehaviour
             }
 
             maxSpeedChange = acceleration * Time.deltaTime;
-            rb.velocity = new Vector2(Mathf.MoveTowards(rb.velocity.x, playerInputActions.Player.Move.ReadValue<Vector2>().x * (maxSpeed - GroundFriction), maxSpeedChange), rb.velocity.y);
+            rb.velocity = new Vector2(Mathf.MoveTowards(rb.velocity.x, MovementInputX * (maxSpeed - GroundFriction), maxSpeedChange), rb.velocity.y);
     }
+    public void OnMove(InputAction.CallbackContext context)
+    {
+        MovementInputX = context.ReadValue<Vector2>().x;
+    }
+    public void OnShoot(InputAction.CallbackContext context)
+    {
+        IsHoldingShoot = context.action.IsPressed();
+        print(context.ReadValueAsButton());
+    }
+    
+    public void MoveMouse(InputAction.CallbackContext context)
+    {
+        if(context.performed)
+        {
+            if(context.action.activeControl.device.ToString() != "Mouse:/Mouse")
+        {
+            if(context.ReadValue<Vector2>().x != 0 && context.ReadValue<Vector2>().y != 0)
+            {
+                ControllerMagnitude = context.ReadValue<Vector2>();
+                IsMovingControllerRightJoystick = true;
+            }
+            else
+            {
+                ControllerMagnitude = context.ReadValue<Vector2>();
+                IsMovingControllerRightJoystick = false;
+            }
+        }
+        else
+        {
+            IsMovingControllerRightJoystick = false;
+            MousePosInCameraSpace = context.ReadValue<Vector2>();
+        }
+    }
+        }
     public void Jump(InputAction.CallbackContext context)
     {
         if(context.performed)
