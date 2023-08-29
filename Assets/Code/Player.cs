@@ -32,69 +32,29 @@ public class Player : MonoBehaviour
 
     // Movement
     private Vector2 _desiredVelocity;
-<<<<<<< HEAD
-    private float maxSpeedChange, acceleration;
-    public Vector2 MousePosInCameraSpace;
-    GameObject ControllerCursor;
-
-
-=======
     private float _maxSpeedChange, _acceleration;
 
->>>>>>> parent of f13981f (Added support for new input system)
     public GunType gun1;
     public GunType gun2;
     private GameObject Gun1Instance;
     private GameObject Gun2Instance;
     public LayerMask GroundedLayers;
-    float MovementInputX;
-    public bool IsHoldingShoot;
-    public float ControllerMoveSpeed;
-    Camera GameCamera;
-    public bool IsMovingControllerRightJoystick;
-    Vector2 ControllerMagnitude;
-    Vector2 CursorPos;
-    public float StickDeadzone;
 
     void Awake()
     {
         rb = gameObject.GetComponent<Rigidbody2D>();
         DefaultGravityScale = 1;
         sprite = gameObject.GetComponent<SpriteRenderer>();
-<<<<<<< HEAD
-        if(gun1 != null)
-        {
-            Gun1Instance = Instantiate(gun1, transform).gameObject;
-            Gun1Instance.SetActive(true);
-        }
-        if(gun2 != null)
-        {
-            Gun2Instance = Instantiate(gun2, transform).gameObject;
-            Gun2Instance.SetActive(false);
-        }
-        GameCamera = FindObjectOfType<Camera>();
-        IsMovingControllerRightJoystick = false;
-        ControllerCursor = GameObject.Find("Cursor");
-=======
 
         Gun1Instance = Instantiate(gun1, transform).gameObject;
         Gun2Instance = Instantiate(gun2, transform).gameObject;
         Gun1Instance.SetActive(true);
         Gun2Instance.SetActive(false);
->>>>>>> parent of f13981f (Added support for new input system)
     }
 
     // Update is called once per frame
     void Update()
     {
-        if(!IsMovingControllerRightJoystick)
-        {
-
-        }
-        else
-        {
-
-        }
         Grounded();
         if(gun1 is LaserGun && Gun1Instance.activeInHierarchy)
             {
@@ -226,50 +186,7 @@ public class Player : MonoBehaviour
             }
             else{
                 Move();
-<<<<<<< HEAD
-            }*/
-    if(IsMovingControllerRightJoystick)
-    {
-        if(ControllerMagnitude.x > 0)
-        {
-            if(ControllerMagnitude.x > StickDeadzone)
-            {
-ControllerCursor.transform.position += (Vector3)ControllerMagnitude * Time.deltaTime * ControllerMoveSpeed;
-        MousePosInCameraSpace = ControllerCursor.transform.position;
-        print(ControllerMagnitude);
             }
-        }
-        else if(ControllerMagnitude.x < 0)
-        {
-            if(ControllerMagnitude.x < -StickDeadzone)
-            {
-ControllerCursor.transform.position += (Vector3)ControllerMagnitude * Time.deltaTime * ControllerMoveSpeed;
-        MousePosInCameraSpace = ControllerCursor.transform.position;
-        print(ControllerMagnitude);
-            }
-        }
-        if(ControllerMagnitude.y > 0)
-        {
-            if(ControllerMagnitude.y > StickDeadzone)
-            {
-                ControllerCursor.transform.position += (Vector3)ControllerMagnitude * Time.deltaTime * ControllerMoveSpeed;
-        MousePosInCameraSpace = ControllerCursor.transform.position;
-        print(ControllerMagnitude);
-            }
-        }
-        else if(ControllerMagnitude.y < 0)
-        {
-            if(ControllerMagnitude.y < -StickDeadzone)
-            {
-                ControllerCursor.transform.position += (Vector3)ControllerMagnitude * Time.deltaTime * ControllerMoveSpeed;
-        MousePosInCameraSpace = ControllerCursor.transform.position;
-        print(ControllerMagnitude);
-            }
-        }
-    }
-=======
-            }
->>>>>>> parent of f13981f (Added support for new input system)
     }
     public void SetVelocity(Vector2 velocity)
     {
@@ -286,52 +203,11 @@ ControllerCursor.transform.position += (Vector3)ControllerMagnitude * Time.delta
                 _acceleration = _maxAirAcceleration;
             }
 
-<<<<<<< HEAD
-            maxSpeedChange = acceleration * Time.deltaTime;
-            rb.velocity = new Vector2(Mathf.MoveTowards(rb.velocity.x, MovementInputX * (maxSpeed - GroundFriction), maxSpeedChange), rb.velocity.y);
-    }
-    public void OnMove(InputAction.CallbackContext context)
-    {
-        MovementInputX = context.ReadValue<Vector2>().x;
-    }
-    public void OnShoot(InputAction.CallbackContext context)
-    {
-        IsHoldingShoot = context.action.IsPressed();
-        print(context.ReadValueAsButton());
-    }
-    
-    public void MoveMouse(InputAction.CallbackContext context)
-    {
-        if(context.performed)
-        {
-            if(context.action.activeControl.device.ToString() != "Mouse:/Mouse")
-        {
-            if(context.ReadValue<Vector2>().x != 0 && context.ReadValue<Vector2>().y != 0)
-            {
-                ControllerMagnitude = context.ReadValue<Vector2>();
-                IsMovingControllerRightJoystick = true;
-            }
-            else
-            {
-                ControllerMagnitude = context.ReadValue<Vector2>();
-                IsMovingControllerRightJoystick = false;
-            }
-        }
-        else
-        {
-            IsMovingControllerRightJoystick = false;
-            MousePosInCameraSpace = context.ReadValue<Vector2>();
-        }
-    }
-        }
-    public void Jump(InputAction.CallbackContext context)
-=======
             _maxSpeedChange = _acceleration * Time.deltaTime;
 
             rb.velocity = new Vector2(Mathf.MoveTowards(rb.velocity.x, _desiredVelocity.x, _maxSpeedChange), rb.velocity.y);
     }
     void Jump()
->>>>>>> parent of f13981f (Added support for new input system)
     {
         if(DesiredJump)
         {

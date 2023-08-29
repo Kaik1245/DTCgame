@@ -32,13 +32,7 @@ public class ChargeGun : GunType
     // Update is called once per frame
     void Update()
     {
-            if(player.IsMovingControllerRightJoystick){
-                transform.rotation = Quaternion.Euler(0, 0, RotateTowardsPosition(transform.position, player.MousePosInCameraSpace, 0));
-            }
-            else
-            {
-                transform.rotation = Quaternion.Euler(0, 0, RotateTowardsPosition(transform.position, GameCamera.ScreenToWorldPoint(player.MousePosInCameraSpace), 0));
-            }
+        transform.rotation = Quaternion.Euler(0, 0, RotateTowardsPosition(transform.position, GameCamera.ScreenToWorldPoint(Input.mousePosition), 0));
 
         if(!IsReloading)
         {
@@ -72,10 +66,9 @@ public class ChargeGun : GunType
     }
     void Shoot()
     {
-        if(player.IsHoldingShoot)
+        if(Input.GetMouseButton(0))
         {
             ActualHoldTime += TimeIncrement * Time.deltaTime;
-            //print(ActualHoldTime);
         }
         else
         {
@@ -83,14 +76,7 @@ public class ChargeGun : GunType
             {
             if(ActualHoldTime <= MinHoldTime)
             {
-                if(player.IsMovingControllerRightJoystick)
-                {
-                    player.SetVelocity(Recoil(MinRecoilAmount, player.MousePosInCameraSpace, player.transform.position, 90));
-                }
-                else
-                {
-                    player.SetVelocity(Recoil(MinRecoilAmount, GameCamera.ScreenToWorldPoint(player.MousePosInCameraSpace), player.transform.position, 90));
-                }
+                player.SetVelocity(Recoil(MinRecoilAmount, GameCamera.ScreenToWorldPoint(Input.mousePosition), player.transform.position, 90));
 
                 if(ActualShotAmount <= MaxShotAmount)
                 {
@@ -106,28 +92,14 @@ public class ChargeGun : GunType
             {
                 if(ActualHoldTime >= MaxHoldTime)
                 {
-                if(player.IsMovingControllerRightJoystick)
-                {
-                    player.SetVelocity(Recoil(MinRecoilAmount, player.MousePosInCameraSpace, player.transform.position, 90));
-                }
-                else
-                {
-                    player.SetVelocity(Recoil(MaxRecoilAmount, GameCamera.ScreenToWorldPoint(player.MousePosInCameraSpace), player.transform.position, 90));
-                }
+                    player.SetVelocity(Recoil(MaxRecoilAmount, GameCamera.ScreenToWorldPoint(Input.mousePosition), player.transform.position, 90));
 
                     ShootBullet(bullet, transform.position, transform.eulerAngles.z);
                     ActualShotAmount += 1;
                 }
                 else
                 {
-                    if(player.IsMovingControllerRightJoystick)
-                    {
-                        player.SetVelocity(Recoil(MinRecoilAmount, player.MousePosInCameraSpace, player.transform.position, 90));
-                    }
-                    else
-                    {
-                        player.SetVelocity(Recoil((ActualHoldTime / (MaxHoldTime)) * MaxRecoilAmount, GameCamera.ScreenToWorldPoint(player.MousePosInCameraSpace), player.transform.position, 90));
-                    }
+                    player.SetVelocity(Recoil((ActualHoldTime / (MaxHoldTime)) * MaxRecoilAmount, GameCamera.ScreenToWorldPoint(Input.mousePosition), player.transform.position, 90));
                     ShootBullet(bullet, transform.position, transform.eulerAngles.z);
                     ActualShotAmount += 1;
                 }
