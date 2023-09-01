@@ -215,6 +215,4 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   bullet: {fileID: -6184029600406222397, guid: 53ac3889404b2d54ba10cd04d117a28b, type: 3}
-  MaxShotAmount: 16
-  CoolDownTime: 3
-  ReloadTime: 3
+  FireRate: 0.2

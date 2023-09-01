@@ -10,6 +10,9 @@ public class NormalBullet : BulletType
     float ActualTime = 0;
     public float TimeToAdd = 0.05f;
     public float DamageAmount = 3.4f;
+    public float ExplosionRadius;
+    public float ExplosionBlastAmount;
+    public float ExplosionDamageAmount;
 
     void Awake()
     {
@@ -17,7 +20,7 @@ public class NormalBullet : BulletType
     }
     void InitiateVariables()
     {
-        
+
     }
     void Start()
     {
@@ -27,20 +30,41 @@ public class NormalBullet : BulletType
     // Update is called once per frame
     void Update()
     {
-        
+
     }
     void FixedUpdate()
     {
-        if(ActualTime >= TimeAlive)
+        if (ActualTime >= TimeAlive)
         {
             Destroy(this.gameObject);
         }
         ActualTime += TimeToAdd;
     }
-    void OnTriggerEnter2D(Collider2D other) {
-        if(other.tag == "EnemyTypeA")
+    void OnTriggerEnter2D(Collider2D other)
+    {
+        if (ExplodesInCollision)
+        {
+            Explode(ExplosionRadius, ExplosionDamageAmount, ExplosionBlastAmount);
+        }
+        else if (other.tag == "EnemyTypeA" && !ExplodesInCollision)
         {
             EnemyTypeA enemy = other.GetComponent<EnemyTypeA>();
+            enemy.health -= DamageAmount;
+            Destroy(this.gameObject);
+        }
+        else if (other.tag == "Ground")
+        {
+            Destroy(this.gameObject);
+        }
+        else if(other.tag == "EnemyTypeB")
+        {
+            EnemyTypeB enemy = other.GetComponent<EnemyTypeB>();
+            enemy.health -= DamageAmount;
+            Destroy(this.gameObject);
+        }
+        else if (other.tag == "EnemyTypeC")
+        {
+            EnemyTypeC enemy = other.GetComponent<EnemyTypeC>();
             enemy.health -= DamageAmount;
             Destroy(this.gameObject);
         }

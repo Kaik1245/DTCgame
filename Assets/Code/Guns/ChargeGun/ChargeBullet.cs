@@ -13,6 +13,9 @@ public class ChargeBullet : BulletType
     public float TimeToAdd = 0.05f;
     public float MaxDamageAmount = 3.4f;
     public float ActualDamageAmount = 0;
+    public float ExplosionRadius;
+    public float ExplosionBlastAmount;
+    public float ExplosionDamageAmount;
 
     void Awake()
     {
@@ -44,12 +47,26 @@ public class ChargeBullet : BulletType
     {
          rb.velocity += velocity;
     }
-    /*void OnTriggerEnter2D(Collider2D other) {
+    void OnTriggerEnter2D(Collider2D other) {
         if(other.tag == "EnemyTypeA")
         {
             EnemyTypeA enemy = other.GetComponent<EnemyTypeA>();
-            enemy.health -= ActualDamageAmount;
+            if(ExplodesInCollision)
+            {
+                enemy.health -= ExplosionDamageAmount;
+            }
+            else{
+                enemy.health -= ActualDamageAmount;
+            }
             Destroy(this.gameObject);
         }
-    }*/
+        else if(other.tag == "Ground")
+        {
+            Destroy(this.gameObject);
+        }
+        else if (other.tag != "EnemyTypeA" && other.tag != "Bullet" && ExplodesInCollision)
+        {
+            Explode(ExplosionRadius, ExplosionDamageAmount, ExplosionBlastAmount);
+        }
+    }
 }

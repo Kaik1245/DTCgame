@@ -171,7 +171,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: e241c9b5d627f104ea8698c8c6abd247, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  ExplodesInCollision: 1
   Speed: 1050
   TimeAlive: 5
   TimeToAdd: 0.05
-  DamageAmount: 3.4
+  DamageAmount: 0.4
+  ExplosionRadius: 1.29
+  ExplosionBlastAmount: 2.09
+  ExplosionDamageAmount: 1.5

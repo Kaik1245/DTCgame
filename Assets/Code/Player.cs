@@ -5,23 +5,25 @@ using System.Diagnostics;
 using System.Linq.Expressions;
 using System.Threading;
 using UnityEngine;
-using UnityEngine.AI;
+using UnityEngine.SceneManagement;
 
 // Help me 
 // TO DO: Fix shooting cool down
 public class Player : MonoBehaviour
 {
     // Jump
-    [SerializeField] private float _jumpHeight = 3f;
-    [SerializeField] private float _downwardMovementMultiplier = 3f;
-    [SerializeField] private float _upwardMovementMultiplier = 1.7f;
+    [SerializeField] private float JumpHeight = 3f;
+    [SerializeField] private float DownwardMovementMultiplier = 3f;
+    [SerializeField] private float UpwardMovementMultiplier = 1.7f;
+    public int AllowedAmountToJump = 2;
+    int JumpAmount;
 
     // Movement
-    [SerializeField] private float _maxSpeed = 4f;
-    [SerializeField] private float _maxAcceleration = 35f;
-    [SerializeField] private float _maxAirAcceleration = 20f;
+    [SerializeField] private float MaxSpeed = 4f;
+    [SerializeField] private float MaxAcceleration = 35f;
+    [SerializeField] private float MaxAirAcceleration = 20f;
 
-    private Rigidbody2D rb;
+    public Rigidbody2D rb;
     public float RaycastDistance = 1;
     public float GroundFriction = 0.1f;
     private SpriteRenderer sprite;
@@ -31,162 +33,91 @@ public class Player : MonoBehaviour
     private bool DesiredJump, OnGround;
 
     // Movement
-    private Vector2 _desiredVelocity;
-    private float _maxSpeedChange, _acceleration;
+    private Vector2 DesiredVelocity;
+    private float MaxSpeedChange, acceleration;
 
-    public GunType gun1;
-    public GunType gun2;
-    private GameObject Gun1Instance;
-    private GameObject Gun2Instance;
+    public GunType ChosenGun;
+    private GameObject GunInstance;
     public LayerMask GroundedLayers;
+    private GameObject WeaponsManager;
+    public int PlayerHealth;
+    public GameObject gameManager;
+    public int MaxHealth;
+
+    public Animator PlayerAimator;
 
     void Awake()
     {
+        PlayerHealth = MaxHealth;
+        WeaponsManager = FindObjectOfType<WeaponSelectionManager>().gameObject;
+        ChosenGun = WeaponsManager.GetComponent<WeaponSelectionManager>().ChosenGun;
+        if (WeaponsManager.GetComponent<WeaponSelectionManager>().Explodes)
+        {
+            if (ChosenGun is Riflegun)
+            {
+                ChosenGun.GetComponent<Riflegun>().BulletExplosion = true;
+            }
+            else if (ChosenGun is NormalGun)
+            {
+                ChosenGun.GetComponent<NormalGun>().BulletExplosion = true;
+            }
+            else if (ChosenGun is Shotgun)
+            {
+                ChosenGun.GetComponent<Shotgun>().BulletExplosion = true;
+            }
+        }
         rb = gameObject.GetComponent<Rigidbody2D>();
         DefaultGravityScale = 1;
         sprite = gameObject.GetComponent<SpriteRenderer>();
 
-        Gun1Instance = Instantiate(gun1, transform).gameObject;
-        Gun2Instance = Instantiate(gun2, transform).gameObject;
-        Gun1Instance.SetActive(true);
-        Gun2Instance.SetActive(false);
+        if (ChosenGun != null)
+        {
+            GunInstance = Instantiate(ChosenGun, transform).gameObject;
+            GunInstance.SetActive(true);
+        }
+        JumpAmount = 0;
     }
 
     // Update is called once per frame
     void Update()
     {
-        Grounded();
-        if(gun1 is LaserGun && Gun1Instance.activeInHierarchy)
-            {
-                if(Gun1Instance.GetComponent<LaserGun>().ActualTimeStillBeforeShooting == 0)
-                {
-                    if(Input.GetKeyDown(KeyCode.Space))
-                    {
-                        DesiredJump = true;
-                        Jump();
-                    }
-                    else
-                    {
-                        DesiredJump = false;
-                    }
-                    _desiredVelocity = new Vector2(Input.GetAxisRaw("Horizontal") * (_maxSpeed - GroundFriction), 0f);
-                }
-            }
-            else if(gun2 is LaserGun && Gun2Instance.activeInHierarchy)
-            {
-                if(Gun2Instance.GetComponent<LaserGun>().ActualTimeStillBeforeShooting == 0)
-                {
-                    if(Input.GetKeyDown(KeyCode.Space))
-                    {
-                        DesiredJump = true;
-                        Jump();
-                    }
-                    else
-                    {
-                        DesiredJump = false;
-                    }
-                    _desiredVelocity = new Vector2(Input.GetAxisRaw("Horizontal") * (_maxSpeed - GroundFriction), 0f);
-                }
-            }
-            else{
-
-                if(Input.GetKeyDown(KeyCode.Space))
-                {
-                    DesiredJump = true;
-                    Jump();
-                }
-                else
-                {
-                    DesiredJump = false;
-                }
-                _desiredVelocity = new Vector2(Input.GetAxisRaw("Horizontal") * (_maxSpeed - GroundFriction), 0f);
-            }
-        if(_desiredVelocity.x > 0)
+        if(PlayerHealth <= 0)
         {
-            sprite.flipX = true;
+            gameManager.GetComponent<GameManager>().loose = true;
+            Destroy(this.gameObject);
         }
-        else if(_desiredVelocity.x < 0)
+        Grounded();
+
+        if (Input.GetKeyDown(KeyCode.Space))
+        {
+            DesiredJump = true;
+        }
+        else
+        {
+            DesiredJump = false;
+        }
+        DesiredVelocity = new Vector2(Input.GetAxisRaw("Horizontal") * (MaxSpeed - GroundFriction), 0f);
+        if (DesiredVelocity.x > 0)
         {
             sprite.flipX = false;
         }
-        ChangeGun();
-    }
-    void ChangeGun()
-    {
-        if(Input.GetKeyDown(KeyCode.Q))
+        else if (DesiredVelocity.x < 0)
         {
-            if(Gun1Instance.activeSelf == true)
+            sprite.flipX = true;
+        }
+        if (JumpAmount != 0 && JumpAmount >= AllowedAmountToJump)
+        {
+            if (OnGround)
             {
-                if(gun1 is ChargeGun)
-                {
-                    Gun1Instance.GetComponent<ChargeGun>().ResetGun();
-                }
-                else if(gun1 is NormalGun)
-                {
-                    Gun1Instance.GetComponent<NormalGun>().ResetGun();
-                }
-                else if(gun1 is LaserGun)
-                {
-                    Gun1Instance.GetComponent<LaserGun>().ResetGun();
-                }
-                else if(gun1 is RocketGun)
-                {
-                    Gun1Instance.GetComponent<RocketGun>().ResetGun();
-                }
-                else if(gun1 is Grenade)
-                {
-                    Gun1Instance.GetComponent<Grenade>().ResetGun();
-                }
-                Gun2Instance.SetActive(true);
-                Gun1Instance.SetActive(false);
-
-            }
-            else if(Gun2Instance.activeSelf == true)
-            {
-                if(gun2 is ChargeGun)
-                {
-                    Gun2Instance.GetComponent<ChargeGun>().ResetGun();
-                }
-                else if(gun2 is NormalGun)
-                {
-                    Gun2Instance.GetComponent<NormalGun>().ResetGun();
-                }
-                else if(gun2 is LaserGun)
-                {
-                    Gun2Instance.GetComponent<LaserGun>().ResetGun();
-                }
-                else if(gun2 is RocketGun)
-                {
-                    Gun2Instance.GetComponent<RocketGun>().ResetGun();
-                }
-                else if(gun2 is Grenade)
-                {
-                    Gun2Instance.GetComponent<Grenade>().ResetGun();
-                }
-
-                Gun2Instance.SetActive(false);
-                Gun1Instance.SetActive(true);
+                JumpAmount = 0;
             }
         }
+        Jump();
+        PlayerAimator.SetFloat("Speed", Mathf.Abs(DesiredVelocity.x));
     }
-    private void FixedUpdate() {
-            if(gun1 is LaserGun && Gun1Instance.activeInHierarchy)
-            {
-                if(Gun1Instance.GetComponent<LaserGun>().ActualTimeStillBeforeShooting == 0)
-                {
-                    Move();
-                }
-            }
-            else if(gun2 is LaserGun && Gun2Instance.activeInHierarchy)
-            {
-                if(Gun2Instance.GetComponent<LaserGun>().ActualTimeStillBeforeShooting == 0)
-                {
-                    Move();
-                }
-            }
-            else{
-                Move();
-            }
+    private void FixedUpdate()
+    {
+        Move();
     }
     public void SetVelocity(Vector2 velocity)
     {
@@ -194,38 +125,38 @@ public class Player : MonoBehaviour
     }
     void Move()
     {
-            if(OnGround)
-            {
-                _acceleration = _maxAcceleration;
-            }
-            else
-            {
-                _acceleration = _maxAirAcceleration;
-            }
+        if (OnGround)
+        {
+            acceleration = MaxAcceleration;
+        }
+        else
+        {
+            acceleration = MaxAirAcceleration;
+        }
 
-            _maxSpeedChange = _acceleration * Time.deltaTime;
+        MaxSpeedChange = acceleration * Time.deltaTime;
 
-            rb.velocity = new Vector2(Mathf.MoveTowards(rb.velocity.x, _desiredVelocity.x, _maxSpeedChange), rb.velocity.y);
+        rb.velocity = new Vector2(Mathf.MoveTowards(rb.velocity.x, DesiredVelocity.x, MaxSpeedChange), rb.velocity.y);
     }
     void Jump()
     {
-        if(DesiredJump)
+        if (DesiredJump)
         {
             DesiredJump = false;
             JumpAction();
         }
         // if I am jumping
-        if(rb.velocity.y > 0)
+        if (rb.velocity.y > 0)
         {
-            rb.gravityScale = _upwardMovementMultiplier;
+            rb.gravityScale = UpwardMovementMultiplier;
         }
         // if I am falling
-        else if(rb.velocity.y < 0)
+        if (rb.velocity.y < 0)
         {
-            rb.gravityScale = _downwardMovementMultiplier;
+            rb.gravityScale = DownwardMovementMultiplier;
         }
         // if not falling or jumping
-        else if(rb.velocity.y == 0)
+        else if (rb.velocity.y == 0)
         {
             rb.gravityScale = DefaultGravityScale;
         }
@@ -233,7 +164,7 @@ public class Player : MonoBehaviour
     void Grounded()
     {
         RaycastHit2D hit = Physics2D.Raycast(transform.position, Vector2.down, RaycastDistance, GroundedLayers);
-        if(hit.collider != null)
+        if (hit.collider != null)
         {
             OnGround = true;
         }
@@ -245,18 +176,33 @@ public class Player : MonoBehaviour
     void JumpAction()
     {
         if (OnGround)
+        {
+            JumpSpeed = Mathf.Sqrt(-2f * Physics2D.gravity.y * JumpHeight);
+
+            if (rb.velocity.y > 0f)
             {
-                JumpSpeed = Mathf.Sqrt(-2f * Physics2D.gravity.y * _jumpHeight);
-                
-                if (rb.velocity.y > 0f)
-                {
-                    JumpSpeed = Mathf.Max(JumpSpeed - rb.velocity.y, 0f);
-                }
-                else if (rb.velocity.y < 0f)
-                {
-                    JumpSpeed += Mathf.Abs(rb.velocity.y);
-                }
-                rb.velocity += new Vector2(0, JumpSpeed);
+                JumpSpeed = Mathf.Max(JumpSpeed - rb.velocity.y, 0f);
             }
+            else if (rb.velocity.y < 0f)
+            {
+                JumpSpeed += Mathf.Abs(rb.velocity.y);
+            }
+            rb.velocity += new Vector2(0, JumpSpeed);
+        }
+        else if(JumpAmount < AllowedAmountToJump)
+        {
+            JumpSpeed = Mathf.Sqrt(-2f * Physics2D.gravity.y * JumpHeight);
+
+            if (rb.velocity.y > 0f)
+            {
+                JumpSpeed = Mathf.Max(JumpSpeed - rb.velocity.y, 0f);
+            }
+            else if (rb.velocity.y < 0f)
+            {
+                JumpSpeed += Mathf.Abs(rb.velocity.y);
+            }
+            rb.velocity += new Vector2(0, JumpSpeed);
+            JumpAmount++;
+        }
     }
 }

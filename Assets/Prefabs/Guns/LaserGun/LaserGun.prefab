@@ -216,8 +216,9 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   LaserScript: {fileID: -8745181231589032628, guid: 77784eff5506dc94c8528ec62432074f, type: 3}
   Distance: 41.1
-  TimeAllowedToShoot: 10
-  CoolDownTime: 5
-  TimeIncrement: 1
-  TimeStillBeforeShooting: 2.3
-  ActualTimeStillBeforeShooting: 0
+  TimeAllowedToShoot: 14
+  CoolDownTime: 3.5
+  HitLaserOnLayers:
+    serializedVersion: 2
+    m_Bits: 776
+  DamageAmount: 0.01

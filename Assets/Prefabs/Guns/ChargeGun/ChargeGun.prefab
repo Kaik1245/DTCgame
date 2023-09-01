@@ -215,14 +215,14 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   bullet: {fileID: -8180091653062980325, guid: 05022bf868d32164eb69dca6f93c3d5e, type: 3}
-  MaxShotAmount: 16
-  CoolDownTime: 1.96
+  MaxShotAmount: 0
+  CoolDownTime: 0.6
   ReloadTime: 3
-  MaxRecoilAmount: 13.1
-  MinRecoilAmount: 2
-  MaxHoldTime: 3
+  ActualShotAmount: 9
+  MaxRecoilAmount: 14.2
+  MinRecoilAmount: 3
+  MaxHoldTime: 1.55
   MinHoldTime: 0.7
+  ActualHoldTime: 0
   TimeIncrement: 1
-  sprites:
-  - {fileID: 3435753233780620495}
-  - {fileID: 8172337440398678527}
+  IsReloading: 0

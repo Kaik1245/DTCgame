@@ -14,7 +14,7 @@ public class ChargeGun : GunType
     public float CoolDownTime = 3;
     public float ReloadTime = 3;
     public int ActualShotAmount = 0;
-    
+
     public float MaxRecoilAmount = 5;
     public float MinRecoilAmount = 2;
     // This variable represents the amount of time requiredto reach MaxRecoilAmount
@@ -34,7 +34,7 @@ public class ChargeGun : GunType
     {
         transform.rotation = Quaternion.Euler(0, 0, RotateTowardsPosition(transform.position, GameCamera.ScreenToWorldPoint(Input.mousePosition), 0));
 
-        if(!IsReloading)
+        if (!IsReloading)
         {
             Shoot();
         }
@@ -59,51 +59,58 @@ public class ChargeGun : GunType
     }
     void ManualReloadCheck()
     {
-        if(Input.GetKeyDown(KeyCode.R))
+        if (Input.GetKeyDown(KeyCode.R))
         {
             StartCoroutine(ReloadCoolDown());
         }
     }
     void Shoot()
     {
-        if(Input.GetMouseButton(0))
+        if (Input.GetMouseButton(0))
         {
             ActualHoldTime += TimeIncrement * Time.deltaTime;
         }
         else
         {
-            if(ActualHoldTime > 0)
+            if (ActualHoldTime > 0)
             {
-            if(ActualHoldTime <= MinHoldTime)
-            {
-                player.SetVelocity(Recoil(MinRecoilAmount, GameCamera.ScreenToWorldPoint(Input.mousePosition), player.transform.position, 90));
-
-                if(ActualShotAmount <= MaxShotAmount)
+                if (ActualShotAmount <= MaxShotAmount)
                 {
-                    ShootBullet(bullet, transform.position, transform.eulerAngles.z);
-                    ActualShotAmount += 1;
+                    if (ActualHoldTime <= MinHoldTime)
+                    {
+                        player.SetVelocity(Recoil(MinRecoilAmount, GameCamera.ScreenToWorldPoint(Input.mousePosition), player.transform.position, 90));
+
+                        if (ActualShotAmount <= MaxShotAmount)
+                        {
+                            ShootBullet(bullet, transform.position, transform.eulerAngles.z, (ActualHoldTime / (MaxHoldTime)));
+                            ActualShotAmount += 1;
+                        }
+                        else
+                        {
+                            StartCoroutine(ShotsCooldown());
+                        }
+                    }
+                    else
+                    {
+                        if (ActualHoldTime >= MaxHoldTime)
+                        {
+                            player.SetVelocity(Recoil(MaxRecoilAmount, GameCamera.ScreenToWorldPoint(Input.mousePosition), player.transform.position, 90));
+
+                            ShootBullet(bullet, transform.position, transform.eulerAngles.z, (ActualHoldTime / (MaxHoldTime)));
+                            ActualShotAmount += 1;
+                        }
+                        else
+                        {
+                            player.SetVelocity(Recoil((ActualHoldTime / (MaxHoldTime)) * MaxRecoilAmount, GameCamera.ScreenToWorldPoint(Input.mousePosition), player.transform.position, 90));
+                            ShootBullet(bullet, transform.position, transform.eulerAngles.z, (ActualHoldTime / (MaxHoldTime)));
+                            ActualShotAmount += 1;
+                        }
+                    }
                 }
                 else
                 {
                     StartCoroutine(ShotsCooldown());
                 }
-            }
-            else
-            {
-                if(ActualHoldTime >= MaxHoldTime)
-                {
-                    player.SetVelocity(Recoil(MaxRecoilAmount, GameCamera.ScreenToWorldPoint(Input.mousePosition), player.transform.position, 90));
-
-                    ShootBullet(bullet, transform.position, transform.eulerAngles.z);
-                    ActualShotAmount += 1;
-                }
-                else
-                {
-                    player.SetVelocity(Recoil((ActualHoldTime / (MaxHoldTime)) * MaxRecoilAmount, GameCamera.ScreenToWorldPoint(Input.mousePosition), player.transform.position, 90));
-                    ShootBullet(bullet, transform.position, transform.eulerAngles.z);
-                    ActualShotAmount += 1;
-                }
-            }
             }
             ActualHoldTime = 0;
         }

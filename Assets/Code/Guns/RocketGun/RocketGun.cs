@@ -24,7 +24,7 @@ public class RocketGun : GunType
     {
         transform.rotation = Quaternion.Euler(0, 0, RotateTowardsPosition(transform.position, GameCamera.ScreenToWorldPoint(Input.mousePosition), 0));
 
-        if(!IsReloading)
+        if (!IsReloading)
         {
             Shoot();
         }
@@ -49,25 +49,25 @@ public class RocketGun : GunType
     }
     void ManualReloadCheck()
     {
-        if(Input.GetKeyDown(KeyCode.R))
+        if (Input.GetKeyDown(KeyCode.R))
         {
             StartCoroutine(ReloadCoolDown());
         }
     }
     void Shoot()
     {
-        if(Input.GetMouseButtonDown(0))
+        if (Input.GetMouseButtonDown(0))
         {
-            if(ActualShotAmount < MaxShotAmount)
-                {
-                    player.SetVelocity(Recoil(RecoilAmount, GameCamera.ScreenToWorldPoint(Input.mousePosition), player.transform.position, 90));
-                    ShootBullet(bullet, transform.position, transform.eulerAngles.z);
-                    ActualShotAmount += 1;
-                }
-                else
-                {
-                    StartCoroutine(ShotsCooldown());
-                }
+            if (ActualShotAmount < MaxShotAmount)
+            {
+                player.SetVelocity(Recoil(RecoilAmount, GameCamera.ScreenToWorldPoint(Input.mousePosition), player.transform.position, 90));
+                ShootBullet(bullet, transform.position, transform.eulerAngles.z, 0);
+                ActualShotAmount += 1;
+            }
+            else
+            {
+                StartCoroutine(ShotsCooldown());
+            }
         }
     }
 }
