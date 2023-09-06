@@ -25,6 +25,7 @@ public class EnemyTypeA : MonoBehaviour
     {
         if(health <= 0)
         {
+            PlayerPos.GetComponent<Player>().SoundEffects.StartEnemyHit();
             Destroy(this.gameObject);
         }
         RotateTowardsPlayer();
@@ -58,6 +59,7 @@ public class EnemyTypeA : MonoBehaviour
         while (true)
         {
             yield return new WaitForSeconds(FireRate);
+            PlayerPos.GetComponent<Player>().SoundEffects.StartEnemyShoot();
             shoot();
         }
     }

@@ -51,22 +51,12 @@ public class ChargeBullet : BulletType
         if(other.tag == "EnemyTypeA")
         {
             EnemyTypeA enemy = other.GetComponent<EnemyTypeA>();
-            if(ExplodesInCollision)
-            {
-                enemy.health -= ExplosionDamageAmount;
-            }
-            else{
-                enemy.health -= ActualDamageAmount;
-            }
+            enemy.health -= ActualDamageAmount;
             Destroy(this.gameObject);
         }
         else if(other.tag == "Ground")
         {
             Destroy(this.gameObject);
-        }
-        else if (other.tag != "EnemyTypeA" && other.tag != "Bullet" && ExplodesInCollision)
-        {
-            Explode(ExplosionRadius, ExplosionDamageAmount, ExplosionBlastAmount);
         }
     }
 }

@@ -13,6 +13,7 @@ public class NormalBullet : BulletType
     public float ExplosionRadius;
     public float ExplosionBlastAmount;
     public float ExplosionDamageAmount;
+    private SoundEffectsManager SoundManager;
 
     void Awake()
     {
@@ -25,6 +26,7 @@ public class NormalBullet : BulletType
     void Start()
     {
         rb.AddRelativeForce(Vector2.right * Speed);
+        SoundManager = FindAnyObjectByType<SoundEffectsManager>();
     }
 
     // Update is called once per frame
@@ -42,31 +44,31 @@ public class NormalBullet : BulletType
     }
     void OnTriggerEnter2D(Collider2D other)
     {
-        if (ExplodesInCollision)
+        if (other != null)
         {
-            Explode(ExplosionRadius, ExplosionDamageAmount, ExplosionBlastAmount);
-        }
-        else if (other.tag == "EnemyTypeA" && !ExplodesInCollision)
-        {
-            EnemyTypeA enemy = other.GetComponent<EnemyTypeA>();
-            enemy.health -= DamageAmount;
-            Destroy(this.gameObject);
-        }
-        else if (other.tag == "Ground")
-        {
-            Destroy(this.gameObject);
-        }
-        else if(other.tag == "EnemyTypeB")
-        {
-            EnemyTypeB enemy = other.GetComponent<EnemyTypeB>();
-            enemy.health -= DamageAmount;
-            Destroy(this.gameObject);
-        }
-        else if (other.tag == "EnemyTypeC")
-        {
-            EnemyTypeC enemy = other.GetComponent<EnemyTypeC>();
-            enemy.health -= DamageAmount;
-            Destroy(this.gameObject);
+            SoundManager.StartBulletHit();
+            if (other.tag == "EnemyTypeA")
+            {
+                EnemyTypeA enemy = other.GetComponent<EnemyTypeA>();
+                enemy.health -= DamageAmount;
+                Destroy(this.gameObject);
+            }
+            else if (other.tag == "Ground")
+            {
+                Destroy(this.gameObject);
+            }
+            else if (other.tag == "EnemyTypeB")
+            {
+                EnemyTypeB enemy = other.GetComponent<EnemyTypeB>();
+                enemy.health -= DamageAmount;
+                Destroy(this.gameObject);
+            }
+            else if (other.tag == "EnemyTypeC")
+            {
+                EnemyTypeC enemy = other.GetComponent<EnemyTypeC>();
+                enemy.health -= DamageAmount;
+                Destroy(this.gameObject);
+            }
         }
     }
 }

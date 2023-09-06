@@ -23,6 +23,7 @@ public class EnemyTypeB : MonoBehaviour
     {
         if (health <= 0)
         {
+            PlayerPos.GetComponent<Player>().SoundEffects.StartEnemyHit();
             Destroy(this.gameObject);
         }
     }
@@ -42,6 +43,7 @@ public class EnemyTypeB : MonoBehaviour
         if(collision.tag == "Player")
         {
             Destroy(this.gameObject);
+            collision.GetComponent<Player>().SoundEffects.StartGetHit();
             collision.GetComponent<Player>().PlayerHealth -= damage;
             gameManager.GetComponent<GameManager>().loose = true;
         }

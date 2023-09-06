@@ -12,6 +12,7 @@ TagManager:
   - EnemyTypeB
   - EnemyTypeC
   - EnemyTypeD
+  - DeathGround
   layers:
   - Default
   - TransparentFX
@@ -23,8 +24,8 @@ TagManager:
   - Grenade
   - Enemy
   - Bullet
-  - 
-  - 
+  - Post-Pocessing
+  - DeathGround
   - 
   - 
   - 

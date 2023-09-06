@@ -15,7 +15,7 @@ public class LaserGun : GunType
     public float CoolDownTime;
     public LayerMask HitLaserOnLayers;
     public float DamageAmount;
-    
+    private SoundEffectsManager SoundManager;
 
     // Start is called before the first frame update
     void Start()
@@ -24,6 +24,7 @@ public class LaserGun : GunType
         LaserBeam = Instantiate(LaserScript).gameObject;
         LaserBeam.SetActive(false);
         IsReloading = false;
+        SoundManager = FindObjectOfType<SoundEffectsManager>();
     }
 
     // Update is called once per frame
@@ -45,22 +46,22 @@ public class LaserGun : GunType
 
                         if (Laser2d.collider.tag == "EnemyTypeA")
                         {
-                            Laser2d.collider.GetComponent<EnemyTypeA>().health -= DamageAmount;
+                            Laser2d.collider.GetComponent<EnemyTypeA>().health -= DamageAmount * Time.deltaTime;
                         }
                         else if (Laser2d.collider.tag == "Bullet")
                         {
                             if (Laser2d.collider.GetComponent<EnemyTypeABullet>() != null)
                             {
-                                Laser2d.collider.gameObject.GetComponent<EnemyTypeABullet>().Health -= DamageAmount;
+                                Laser2d.collider.gameObject.GetComponent<EnemyTypeABullet>().Health -= DamageAmount * Time.deltaTime;
                             }
                         }
                         else if(Laser2d.collider.tag == "EnemyTypeB")
                         {
-                            Laser2d.collider.GetComponent<EnemyTypeB>().health -= DamageAmount;
+                            Laser2d.collider.GetComponent<EnemyTypeB>().health -= DamageAmount * Time.deltaTime;
                         }
                         else if (Laser2d.collider.tag == "EnemyTypeC")
                         {
-                            Laser2d.collider.GetComponent<EnemyTypeC>().health -= DamageAmount;
+                            Laser2d.collider.GetComponent<EnemyTypeC>().health -= DamageAmount * Time.deltaTime;
                         }
 
                         // Divive by sixteen because that is the amount of pixels the texture has

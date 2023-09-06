@@ -10,12 +10,13 @@ public class Riflegun : GunType
     public float FireRate = 3;
     private bool IsReloading = false;
     public bool BulletExplosion;
+    private GameManager manager;
 
     void Start()
     {
-        bullet.ExplodesInCollision = true;
         player = FindAnyObjectByType<Player>();
         GameCamera = FindAnyObjectByType<Camera>();
+        manager = FindAnyObjectByType<GameManager>();
     }
     // Update is called once per frame
     void Update()
@@ -25,6 +26,8 @@ public class Riflegun : GunType
         if (Input.GetMouseButtonDown(0) && !IsReloading)
         {
             ShootBullet(bullet, transform.position, transform.eulerAngles.z, 0);
+            manager.SoundManager.StartWeaponShoot();
+            player.HasShot = true;
             StartCoroutine(ShotsCooldown());
         }
     }
@@ -33,5 +36,6 @@ public class Riflegun : GunType
         IsReloading = true;
         yield return new WaitForSeconds(FireRate);
         IsReloading = false;
+        player.HasShot = false;
     }
 }

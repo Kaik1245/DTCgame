@@ -38,6 +38,7 @@ public class EnemyTypeCBullet : MonoBehaviour
         if (other.tag == "Player")
         {
             other.GetComponent<Player>().PlayerHealth -= DamageAmount;
+            other.GetComponent<Player>().SoundEffects.StartGetHit();
             Destroy(this.gameObject);
         }
         else if (other.tag == "Ground")

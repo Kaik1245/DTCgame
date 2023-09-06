@@ -5,8 +5,10 @@ using UnityEngine.SceneManagement;
 
 public class UIManager : MonoBehaviour
 {
+    public SoundEffectsManager SoundManager;
     public void PlayGame()
     {
+        SoundManager.StartButtonSelection();
         SceneManager.LoadScene("WeaponSelection");
     }
     public void CloseGame()

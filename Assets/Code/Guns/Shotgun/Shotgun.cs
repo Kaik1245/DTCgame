@@ -13,13 +13,15 @@ public class Shotgun : GunType
     public float BulletAngleSpacing;
     public float RecoilAmount;
     public bool BulletExplosion;
+    private GameManager manager;
 
 
     void Start()
     {
         player = FindAnyObjectByType<Player>();
         GameCamera = FindAnyObjectByType<Camera>();
-        bullet.ExplodesInCollision = true;
+        manager = FindAnyObjectByType<GameManager>();
+
     }
     // Update is called once per frame
     void Update()
@@ -30,7 +32,9 @@ public class Shotgun : GunType
         { 
             for(float i = -MaxBulletAngle; i < MaxBulletAngle; i += BulletAngleSpacing)
             {
+                manager.SoundManager.StartWeaponShoot();
                 ShootBullet(bullet, transform.position, transform.eulerAngles.z - i, 0);
+                player.HasShot = true;
             }
             player.SetVelocity(Recoil(RecoilAmount, GameCamera.ScreenToWorldPoint(Input.mousePosition), player.transform.position, 90));
             StartCoroutine(ShotsCooldown());
@@ -41,5 +45,6 @@ public class Shotgun : GunType
         IsReloading = true;
         yield return new WaitForSeconds(FireRate);
         IsReloading = false;
+        player.HasShot = false;
     }
 }

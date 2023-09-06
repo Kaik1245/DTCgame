@@ -43,6 +43,11 @@ public class Player : MonoBehaviour
     public int PlayerHealth;
     public GameObject gameManager;
     public int MaxHealth;
+    public bool HasShot = false;
+    public SoundEffectsManager SoundEffects;
+
+    // Particle system
+    public ParticleSystem dust;
 
     public Animator PlayerAimator;
 
@@ -77,6 +82,10 @@ public class Player : MonoBehaviour
         }
         JumpAmount = 0;
     }
+    void Start()
+    {
+        SoundEffects = gameManager.GetComponent<GameManager>().SoundManager;
+    }
 
     // Update is called once per frame
     void Update()
@@ -97,13 +106,21 @@ public class Player : MonoBehaviour
             DesiredJump = false;
         }
         DesiredVelocity = new Vector2(Input.GetAxisRaw("Horizontal") * (MaxSpeed - GroundFriction), 0f);
-        if (DesiredVelocity.x > 0)
+        if (DesiredVelocity.x > 0 && sprite.flipX == true)
         {
             sprite.flipX = false;
+            if (OnGround)
+            {
+                CreateDust();
+            }
         }
-        else if (DesiredVelocity.x < 0)
+        else if (DesiredVelocity.x < 0 && sprite.flipX == false)
         {
             sprite.flipX = true;
+            if(OnGround)
+            {
+                CreateDust();
+            }
         }
         if (JumpAmount != 0 && JumpAmount >= AllowedAmountToJump)
         {
@@ -137,6 +154,10 @@ public class Player : MonoBehaviour
         MaxSpeedChange = acceleration * Time.deltaTime;
 
         rb.velocity = new Vector2(Mathf.MoveTowards(rb.velocity.x, DesiredVelocity.x, MaxSpeedChange), rb.velocity.y);
+    }
+    void CreateDust()
+    {
+        dust.Play();
     }
     void Jump()
     {
@@ -173,10 +194,20 @@ public class Player : MonoBehaviour
             OnGround = false;
         }
     }
+    private void OnCollisionEnter2D(Collision2D collision)
+    {
+        if(collision.collider.tag == "DeathGround")
+        {
+            PlayerHealth = 0;
+            
+        }
+    }
     void JumpAction()
     {
+        CreateDust();
         if (OnGround)
         {
+            SoundEffects.StartJump();
             JumpSpeed = Mathf.Sqrt(-2f * Physics2D.gravity.y * JumpHeight);
 
             if (rb.velocity.y > 0f)
@@ -191,6 +222,7 @@ public class Player : MonoBehaviour
         }
         else if(JumpAmount < AllowedAmountToJump)
         {
+            SoundEffects.StartJump();
             JumpSpeed = Mathf.Sqrt(-2f * Physics2D.gravity.y * JumpHeight);
 
             if (rb.velocity.y > 0f)
