@@ -1,5 +1,4 @@
 # DTCgame
-Bad game.
 
 If you want to install this game follow the set of instructions below:
 
